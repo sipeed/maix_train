@@ -1,0 +1,8 @@
+__pycache__
+temp
+instance
+out
+build
+.ipynb_checkpoints
+.spec
+.pyc
