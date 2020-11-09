@@ -1,7 +1,6 @@
 #!python3
 
 import argparse, os, sys, shutil
-from train import Train, TrainType
 
 
 def main():
@@ -21,11 +20,11 @@ def main():
     parser.add_argument("cmd", help="command", choices=["train", "init"])
     args = parser.parse_args()
     # init
+    dst_config_path = os.path.join(curr_dir, "instance", "config.py")
     if args.cmd == "init":
         instance_dir = os.path.join(curr_dir, "instance")
         if not os.path.exists(instance_dir):
             os.makedirs(instance_dir)
-        dst_config_path = os.path.join(curr_dir, "instance", "config.py")
         if os.path.exists(dst_config_path):
             print("[WARNING] instance/config.py already exists, sure to rewrite it? [yes/no]")
             ensure = input()
@@ -33,6 +32,11 @@ def main():
                 shutil.copyfile(os.path.join(curr_dir, "train", "config_template.py"), dst_config_path)
         print("init done, please edit instance/config.py")
         return 0
+    if not os.path.exists(dst_config_path):
+        print("python3 train.py init first")
+        return -1
+
+    from train import Train, TrainType
     is_zip = os.path.exists(args.zip)
     if not is_zip  and not os.path.exists(args.datasets):
         print("[ERROR] arg -d or -z is essential")
