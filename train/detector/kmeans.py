@@ -73,8 +73,11 @@ def kmeans(boxes, k, dist=np.median):
             break
 
         for cluster in range(k):
-            clusters[cluster] = dist(boxes[nearest_clusters == cluster], axis=0)
-
+            d = boxes[nearest_clusters == cluster]
+            if len(d) == 0:
+                continue
+            clusters[cluster] = dist(d, axis=0)
         last_clusters = nearest_clusters
 
     return clusters
+
