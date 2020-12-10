@@ -6,8 +6,8 @@ curr_dir = os.path.abspath(os.path.dirname(__file__))
 
 
 # kmodel convert
-                 # "/ncc/ncc"  # download from https://github.com/kendryte/nncase/releases/tag/v0.1.0-rc5
-ncc_kmodel_v3 =  os.path.join(curr_dir, "..", "tools", "ncc", "ncc_v0.1/ncc")  
+# "/ncc/ncc"  # download from https://github.com/kendryte/nncase/releases/tag/v0.2.0-beta4
+ncc_kmodel_v3 = os.path.join(curr_dir, "..", "tools", "ncc", "ncc_v0.2/ncc")
 sample_image_num = 20       # convert kmodel sample image (for quantizing)
 
 # train

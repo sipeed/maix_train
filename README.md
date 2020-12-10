@@ -25,7 +25,7 @@ or use aliyun's source if you are in China
 pip3 install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
 ```
 
-* [Download nncase](https://github.com/kendryte/nncase/releases/tag/v0.1.0-rc5) and unzip it to `tools/ncc/ncc_v0.1`, and the executable path is `tools/ncc/ncc_v0.1/ncc`
+* [Download nncase](https://github.com/kendryte/nncase/releases/tag/v0.2.0-beta4) and unzip it to `tools/ncc/ncc_v0.2`, and the executable path is `tools/ncc/ncc_v0.2/ncc`
 * `python3 train.py init`
 * Edit `instance/config.py` according to your hardware
 * Prepare dataset, in the `datasets` directory has some example datasets, input size if `224x224`

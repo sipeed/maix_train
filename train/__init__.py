@@ -350,7 +350,8 @@ class Train():
             @ncc_path ncc 可执行程序路径
             @return (ok, msg) 是否出错 (bool, str)
         '''
-        p =subprocess.Popen([ncc_path, "-i", "tflite", "-o", "k210model", "--dataset", images_path, tf_lite_path, kmodel_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen([ncc_path, "compile", tf_lite_path, kmodel_path, "-i", "tflite", "-o", "kmodel", "-t",
+                              "k210", "--dataset", images_path, ], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
             output, err = p.communicate( )
             res = p.returncode
