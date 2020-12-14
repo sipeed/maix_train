@@ -47,7 +47,7 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
     task = kpu.load(model_addr)
     kpu.init_yolo2(task, 0.5, 0.3, 5, anchors) # threshold:[0,1], nms_value: [0, 1]
     try:
-        while(True):
+        while 1:
             img = sensor.snapshot()
             t = time.ticks_ms()
             objects = kpu.run_yolo2(task, img)
@@ -56,8 +56,8 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
                 for obj in objects:
                     pos = obj.rect()
                     img.draw_rectangle(pos)
-                    img.draw_string(pos[0], pos[1], "%s : %.2f" %(labels[obj.classid()], obj.value()), scale=2)
-            img.draw_string(0, 200, "t:%dms" %(t), scale=2)
+                    img.draw_string(pos[0], pos[1], "%s : %.2f" %(labels[obj.classid()], obj.value()), scale=2, color=(255, 0, 0))
+            img.draw_string(0, 200, "t:%dms" %(t), scale=2, color=(255, 0, 0))
             lcd.display(img)
     except Exception as e:
         raise e
@@ -67,10 +67,10 @@ def main(anchors, labels = None, model_addr="/sd/m.kmodel", sensor_window=(224, 
 
 if __name__ == "__main__":
     try:
-        labels = [] # labels
-        anchors = [] # anchors
-        # main(anchors = anchors, labels=labels, model_addr=0x300000, lcd_rotation=0)
-        main(anchors = anchors, labels=labels, model_addr="/sd/m.kmodel")
+        labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'mouse', 'microbit', 'ruler', 'cat', 'pear', 'ship', 'apple', 'car', 'pen', 'dog', 'umbrella', 'airplane', 'clock', 'grape', 'cup', 'left', 'right', 'front', 'stop']
+        anchors = [3.8125, 3.8125, 5.375, 5.375, 7.1875, 7.1875, 11.25, 11.3125, 9.125, 9.125]
+        main(anchors = anchors, labels=labels, model_addr=0x300000, lcd_rotation=2, sensor_window=(240, 240))
+        # main(anchors = anchors, labels=labels, model_addr="/sd/m.kmodel")
     except Exception as e:
         sys.print_exception(e)
         lcd_show_except(e)
