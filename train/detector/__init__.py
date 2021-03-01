@@ -648,63 +648,61 @@ class Detector(Train_Base):
         # decode xml
         input_shape_checked = False
         for xml_path in xmls:
-            with open(xml_path) as f:
-                xml = f.read()
-                ok, result = decode_pascal_voc_xml(xml)
-                if not ok:
-                    result = f"decode xml {xml_path} fail, reason: {result}"
-                    self.on_warning_message(result)
+            ok, result = decode_pascal_voc_xml(xml_path)
+            if not ok:
+                result = f"decode xml {xml_path} fail, reason: {result}"
+                self.on_warning_message(result)
+                continue
+            # shape
+            img_shape = (result['height'], result['width'], result['depth'])
+            #  check first image shape, and switch to proper supported input_shape
+            if not input_shape_checked:
+                if not self._check_update_input_shape(img_shape) and not self.allow_reshape:
+                    return False, "not supported input size, supported: {}".format(self.support_shapes), [], None, None, None
+                input_shape_checked = True
+            if img_shape != self.input_shape:
+                msg = f"decode xml {xml_path} ok, but shape {img_shape} not the same as expected: {self.input_shape}"
+                if not self.allow_reshape:
+                    self.on_warning_message(msg)
                     continue
-                # shape
-                img_shape = (result['height'], result['width'], result['depth'])
-                #  check first image shape, and switch to proper supported input_shape
-                if not input_shape_checked:
-                    if not self._check_update_input_shape(img_shape) and not self.allow_reshape:
-                        return False, "not supported input size, supported: {}".format(self.support_shapes), [], None, None, None
-                    input_shape_checked = True
-                if img_shape != self.input_shape:
-                    msg = f"decode xml {xml_path} ok, but shape {img_shape} not the same as expected: {self.input_shape}"
-                    if not self.allow_reshape:
-                        self.on_warning_message(msg)
-                        continue
-                    else:
-                        msg += ", will automatically reshape"
-                        self.on_warning_message(msg)
-                # load image
-                dir_name = os.path.split(os.path.split(result['path'])[0])[-1] # class1 / images
-                # images/class1/tututututut.jpg
-                img_path = os.path.join(img_dir, dir_name, result['filename'])
+                else:
+                    msg += ", will automatically reshape"
+                    self.on_warning_message(msg)
+            # load image
+            dir_name = os.path.split(os.path.split(result['path'])[0])[-1] # class1 / images
+            # images/class1/tututututut.jpg
+            img_path = os.path.join(img_dir, dir_name, result['filename'])
+            if os.path.exists(img_path):
+                img = np.array(Image.open(img_path), dtype='uint8')
+            else:
+                # images/tututututut.jpg
+                img_path = os.path.join(img_dir, result['filename'])
                 if os.path.exists(img_path):
                     img = np.array(Image.open(img_path), dtype='uint8')
                 else:
-                    # images/tututututut.jpg
-                    img_path = os.path.join(img_dir, result['filename'])
-                    if os.path.exists(img_path):
-                        img = np.array(Image.open(img_path), dtype='uint8')
-                    else:
-                        result = f"decode xml {xml_path}, can not find iamge: {result['path']}"
-                        self.on_warning_message(result)
-                        continue
-                # load bndboxes
-                y = []
-                for bbox in result['bboxes']:
-                    if not bbox[4] in labels:
-                        result = f"decode xml {xml_path}, can not find iamge: {result['path']}"
-                        self.on_warning_message(result)
-                        continue
-                    label_idx = labels.index(bbox[4])
-                    bbox[4] = label_idx # replace label text with label index
-                    classes_data_counts[label_idx] += 1
-                    # range to [0, 1]
-                    y.append( bbox[:5])
-                if len(y) < 1:
-                    result = f"decode xml {xml_path}, no object, skip"
+                    result = f"decode xml {xml_path}, can not find iamge: {result['path']}"
                     self.on_warning_message(result)
                     continue
-                if img_shape != self.input_shape:
-                    img, y = self._reshape_image(img, self.input_shape, y)
-                datasets_x.append(img)
-                datasets_y.append(y)
+            # load bndboxes
+            y = []
+            for bbox in result['bboxes']:
+                if not bbox[4] in labels:
+                    result = f"decode xml {xml_path}, can not find iamge: {result['path']}"
+                    self.on_warning_message(result)
+                    continue
+                label_idx = labels.index(bbox[4])
+                bbox[4] = label_idx # replace label text with label index
+                classes_data_counts[label_idx] += 1
+                # range to [0, 1]
+                y.append( bbox[:5])
+            if len(y) < 1:
+                result = f"decode xml {xml_path}, no object, skip"
+                self.on_warning_message(result)
+                continue
+            if img_shape != self.input_shape:
+                img, y = self._reshape_image(img, self.input_shape, y)
+            datasets_x.append(img)
+            datasets_y.append(y)
         return True, "ok", labels, classes_data_counts, datasets_x, datasets_y
 
     def _decode_pbtxt_file(self, file_path):
