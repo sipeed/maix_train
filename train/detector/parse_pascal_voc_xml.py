@@ -11,7 +11,7 @@
 import re
 
 
-def decode_pascal_voc_xml(xml_path, ordered = True):
+def decode_pascal_voc_xml(xml_path, ordered = False):
     '''
         @ordered parse labelimg ordered xml by RE, or will use xml parser
         @reuturn bool, info
@@ -75,8 +75,8 @@ def decode_pascal_voc_xml(xml_path, ordered = True):
             "depth": depth,
             "bboxes": []
         }
-        res["filename"] = res["filename"].replace("\\", "/"),
-        res["path"] = res["path"].replace("\\", "/"),
+        res["filename"] = res["filename"].replace("\\", "/")
+        res["path"] = res["path"].replace("\\", "/")
         for t in obj_tags:
             name = t.find("name").text
             box_tag = t.find("bndbox")
